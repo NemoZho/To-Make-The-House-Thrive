@@ -22,7 +22,7 @@ module nemo (
 		end
 	end	
 
-	parameter GROUND_LEVEL = 480;
+	parameter GROUND_LEVEL = 420;
 	parameter GRAVITY = 1;
 	parameter SPEED = 4;
 	parameter IDLE = 3'b000;
@@ -34,6 +34,7 @@ module nemo (
 	parameter KEY_DOWN = 8'b01110010;
 	parameter KEY_LEFT = 8'b01101011;
 	parameter KEY_RIGHT = 8'b01110100;
+	logic [9:0] vertic_speed_w,vertic_speed_r;
 	logic [9:0] posx_w,posy_w,posx_r,posy_r;
 	logic [2:0] state_w,state_r; 
 	logic on_the_ground_w,on_the_ground_r,attacking_w,attacking_r;
@@ -49,7 +50,7 @@ module nemo (
 				state_w = state_r;
 				case(keycode)
 					KEY_UP:begin
-						state_w = UP;
+						state_w = JUMP;
 					end
 					KEY_DOWN:begin
 						state_w = DOWN;
@@ -62,8 +63,8 @@ module nemo (
 					end
 				endcase
 			end
-			UP:begin
-				if (keycode != KEY_UP) begin
+			JUMP:begin
+				if (posy_r >= GROUND_LEVEL) begin
 					state_w = IDLE;
 				end
 			end
@@ -97,11 +98,13 @@ module nemo (
 			posx_w <= posx_r;
 			case(state_r)
 				IDLE:begin
-					posy_w <= posy_r;
+					posy_w <= GROUND_LEVEL;
 					posx_w <= posx_r;
+					vertic_speed_w <= 12;
 				end
-				UP:begin
-					posy_w <= posy_r + SPEED;
+				JUMP:begin
+					posy_w <= posy_r + vertic_speed_r;
+					vertic_speed_w = vertic_speed_w - GRAVITY;
 				end
 				DOWN:begin
 					posy_w <= posy_r - SPEED;
