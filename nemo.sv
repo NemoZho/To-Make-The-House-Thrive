@@ -39,7 +39,7 @@ module nemo (
 	logic [9:0] vertic_speed_w,vertic_speed_r;
 	logic [9:0] posx_w,posy_w,posx_r,posy_r;
 	logic [2:0] state_w,state_r; 
-	logic on_the_ground_w,on_the_ground_r,attacking_w,attacking_r;
+	logic on_the_ground_w,on_the_ground_r,attacking_w,attacking_r,jumped_w,jumped_r;
 	assign X_pos = posx_r;
 	assign Y_pos = posy_r;
 	assign state = state_w;
@@ -66,7 +66,7 @@ module nemo (
 				endcase
 			end
 			JUMP:begin
-				if (posy_r >= GROUND_LEVEL) begin
+				if (posy_r > GROUND_LEVEL) begin
 					state_w = IDLE;
 				end
 			end
@@ -76,26 +76,26 @@ module nemo (
 				end
 			end
 			RIGHT:begin
-				if (keycode != KEY_RIGHT) begin
-					state_w = IDLE;
-				end else if(keycode == KEY_UP) begin
+				if (keycode == KEY_UP) begin
 					state_w = R_JUMP;
+				end else if(keycode != KEY_RIGHT) begin
+					state_w = IDLE;
 				end
 			end
 			LEFT:begin
-				if (keycode != KEY_LEFT) begin
-					state_w = IDLE;
-				end else if(keycode == KEY_UP) begin
+				if (keycode == KEY_UP) begin
 					state_w = L_JUMP;
+				end else if(keycode != KEY_LEFT) begin
+					state_w = IDLE;
 				end
 			end
 			R_JUMP:begin
-				if (posy_r >= GROUND_LEVEL) begin
+				if (posy_r > GROUND_LEVEL) begin
 					state_w = IDLE;
 				end
 			end
 			L_JUMP:begin
-				if (posy_r >= GROUND_LEVEL) begin
+				if (posy_r > GROUND_LEVEL) begin
 					state_w = IDLE;
 				end
 			end
@@ -113,6 +113,7 @@ module nemo (
 			posy_w <= posy_r;
 			posx_w <= posx_r;
 			vertic_speed_w = vertic_speed_r;
+			jumped_w = jumped_r;
 			case(state_r)
 				IDLE:begin
 					posy_w <= GROUND_LEVEL;
@@ -120,26 +121,28 @@ module nemo (
 					vertic_speed_w <= 15;
 				end
 				JUMP:begin
-					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
+					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL+1 : posy_r - vertic_speed_r;
 					vertic_speed_w <= vertic_speed_w - GRAVITY;
 				end
 				DOWN:begin
 					posy_w <= posy_r - SPEED;
 				end
 				RIGHT:begin
+					vertic_speed_w <= 15;
 					posx_w <= posx_r + SPEED;
 				end
 				LEFT:begin
+					vertic_speed_w <= 15;
 					posx_w <= posx_r - SPEED;
 				end
 				R_JUMP:begin
 					posx_w <= posx_r + SPEED;
-					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
+					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL+1 : posy_r - vertic_speed_r;
 					vertic_speed_w <= vertic_speed_w - GRAVITY;
 				end
 				L_JUMP:begin
 					posx_w <= posx_r - SPEED;
-					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
+					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL+1 : posy_r - vertic_speed_r;
 					vertic_speed_w <= vertic_speed_w - GRAVITY;
 				end
 			endcase
@@ -152,11 +155,13 @@ module nemo (
 			posy_r <= GROUND_LEVEL;
 			posx_r <= 10'd300;
 			state_r <= IDLE;
+			jumped_r <= 0;
 		end else begin
 			vertic_speed_r <= vertic_speed_w;
 			state_r <= state_w;
 			posy_r <= posy_w;
 			posx_r <= posx_w;
+			jumped_r <= jumped_w;
 		end
 	end
 endmodule
