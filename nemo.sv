@@ -15,15 +15,15 @@ module nemo (
 			clk_50hz <= 0;
 		end else begin
 			clk_50hz_counter = clk_50hz_counter + 1;
-			if (clk_50hz_counter > 3000000) begin
+			if (clk_50hz_counter > 1000000) begin
 				clk_50hz <= ~clk_50hz;
 				clk_50hz_counter <= 0;
 			end
 		end
 	end	
 
-	parameter GROUND_LEVEL = 100;
-	parameter GRAVITY = 1;
+	parameter GROUND_LEVEL = 10'd300;
+	parameter GRAVITY = 2;
 	parameter SPEED = 4;
 	parameter IDLE = 3'b000;
 	parameter RIGHT = 3'b001;
@@ -91,8 +91,8 @@ module nemo (
 	//以50hz處理位置+速度
 	always_ff @(posedge clk_50hz or negedge rst_n)begin
 		if(!rst_n) begin
-			posx_w <= 50;
-			posy_w <= 50;
+			posx_w <= 10'd300;
+			posy_w <= GROUND_LEVEL;
 		end else begin
 			posy_w <= posy_r;
 			posx_w <= posx_r;
@@ -104,7 +104,7 @@ module nemo (
 					vertic_speed_w <= 15;
 				end
 				JUMP:begin
-					posy_w <= posy_r + vertic_speed_r;
+					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
 					vertic_speed_w <= vertic_speed_w - GRAVITY;
 				end
 				DOWN:begin
@@ -124,7 +124,7 @@ module nemo (
 	always_ff @(posedge clk or negedge rst_n)begin
 		if(!rst_n) begin
 			posy_r <= GROUND_LEVEL;
-			posx_r <= 50;
+			posx_r <= 10'd300;
 			state_r <= IDLE;
 		end else begin
 			vertic_speed_r <= vertic_speed_w;

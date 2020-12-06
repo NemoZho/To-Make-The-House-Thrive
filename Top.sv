@@ -20,7 +20,7 @@ module Top (
 	 logic [3:0] o_tblf;
     assign o_ledg[7:0] = key_ascii;
 	 assign o_ledr[17:9] = X_pos;
-	 assign o_ledr[8:0] = o_tblf;
+	 assign o_ledr[8:0] = Y_pos;
 
 Keyboard kb0(
     .clk(i_clk),
