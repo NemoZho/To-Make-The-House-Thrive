@@ -28,7 +28,7 @@ module nemo (
 	parameter IDLE = 3'b000;
 	parameter RIGHT = 3'b001;
 	parameter LEFT = 3'b010;
-	parameter UP = 3'b011;
+	parameter JUMP = 3'b011;
 	parameter DOWN = 3'b100;
 	parameter KEY_UP = 8'b01110101;
 	parameter KEY_DOWN = 8'b01110010;
