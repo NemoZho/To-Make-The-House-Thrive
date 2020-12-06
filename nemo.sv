@@ -22,6 +22,8 @@ module nemo (
 		end
 	end	
 
+	parameter GROUND_LEVEL = 480;
+	parameter GRAVITY = 1;
 	parameter SPEED = 4;
 	parameter IDLE = 3'b000;
 	parameter RIGHT = 3'b001;
@@ -34,6 +36,7 @@ module nemo (
 	parameter KEY_RIGHT = 8'b01110100;
 	logic [9:0] posx_w,posy_w,posx_r,posy_r;
 	logic [2:0] state_w,state_r; 
+	logic on_the_ground_w,on_the_ground_r,attacking_w,attacking_r;
 	assign X_pos = posx_r;
 	assign Y_pos = posy_r;
 	assign state = state_w;
