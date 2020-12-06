@@ -30,6 +30,8 @@ module nemo (
 	parameter LEFT = 3'b010;
 	parameter JUMP = 3'b011;
 	parameter DOWN = 3'b100;
+	parameter L_JUMP = 3'b101;
+	parameter R_JUMP = 3'b110;
 	parameter KEY_UP = 8'b01110101;
 	parameter KEY_DOWN = 8'b01110010;
 	parameter KEY_LEFT = 8'b01101011;
@@ -76,10 +78,24 @@ module nemo (
 			RIGHT:begin
 				if (keycode != KEY_RIGHT) begin
 					state_w = IDLE;
+				end else if(keycode == KEY_UP) begin
+					state_w = R_JUMP;
 				end
 			end
 			LEFT:begin
 				if (keycode != KEY_LEFT) begin
+					state_w = IDLE;
+				end else if(keycode == KEY_UP) begin
+					state_w = L_JUMP;
+				end
+			end
+			R_JUMP:begin
+				if (posy_r >= GROUND_LEVEL) begin
+					state_w = IDLE;
+				end
+			end
+			L_JUMP:begin
+				if (posy_r >= GROUND_LEVEL) begin
 					state_w = IDLE;
 				end
 			end
@@ -115,6 +131,16 @@ module nemo (
 				end
 				LEFT:begin
 					posx_w <= posx_r - SPEED;
+				end
+				R_JUMP:begin
+					posx_w <= posx_r + SPEED;
+					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
+					vertic_speed_w <= vertic_speed_w - GRAVITY;
+				end
+				L_JUMP:begin
+					posx_w <= posx_r - SPEED;
+					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
+					vertic_speed_w <= vertic_speed_w - GRAVITY;
 				end
 			endcase
 		end
