@@ -7,7 +7,7 @@ module nemo (
 );
 
 	logic clk_50hz;
-	logic [19:0] clk_50hz_counter;
+	logic [21:0] clk_50hz_counter;
 	//generate 50hz singnal 
 	always_ff @(posedge clk or negedge rst_n)begin
 		if(!rst_n) begin
@@ -15,14 +15,14 @@ module nemo (
 			clk_50hz <= 0;
 		end else begin
 			clk_50hz_counter = clk_50hz_counter + 1;
-			if (clk_50hz_counter > 1000000) begin
+			if (clk_50hz_counter > 3000000) begin
 				clk_50hz <= ~clk_50hz;
 				clk_50hz_counter <= 0;
 			end
 		end
 	end	
 
-	parameter GROUND_LEVEL = 420;
+	parameter GROUND_LEVEL = 100;
 	parameter GRAVITY = 1;
 	parameter SPEED = 4;
 	parameter IDLE = 3'b000;
@@ -96,15 +96,16 @@ module nemo (
 		end else begin
 			posy_w <= posy_r;
 			posx_w <= posx_r;
+			vertic_speed_w = vertic_speed_r;
 			case(state_r)
 				IDLE:begin
 					posy_w <= GROUND_LEVEL;
 					posx_w <= posx_r;
-					vertic_speed_w <= 12;
+					vertic_speed_w <= 15;
 				end
 				JUMP:begin
 					posy_w <= posy_r + vertic_speed_r;
-					vertic_speed_w = vertic_speed_w - GRAVITY;
+					vertic_speed_w <= vertic_speed_w - GRAVITY;
 				end
 				DOWN:begin
 					posy_w <= posy_r - SPEED;
@@ -122,10 +123,11 @@ module nemo (
 
 	always_ff @(posedge clk or negedge rst_n)begin
 		if(!rst_n) begin
-			posy_r <= 50;
+			posy_r <= GROUND_LEVEL;
 			posx_r <= 50;
 			state_r <= IDLE;
 		end else begin
+			vertic_speed_r <= vertic_speed_w;
 			state_r <= state_w;
 			posy_r <= posy_w;
 			posx_r <= posx_w;

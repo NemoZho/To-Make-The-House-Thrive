@@ -2,17 +2,17 @@
 module  VGA(
     input           i_clk,
     input           i_rst_n,
-	 input    [9:0]  X_pos,
+     input    [9:0]  X_pos,
     input    [9:0]  Y_pos,
-	 output 	 [3:0]  o_tblf,
-	 output				o_vga_clk, 	    // vga_clk
-    output          o_hs,   		// horizontal sync
-    output          o_vs,   		// vertical sync
+     output      [3:0]  o_tblf,
+     output             o_vga_clk,      // vga_clk
+    output          o_hs,           // horizontal sync
+    output          o_vs,           // vertical sync
     output   [5:0]  o_red,
     output   [5:0]  o_green,
     output   [5:0]  o_blue
 );
-	//for 640x480@60Hz 25.175MHz
+    //for 640x480@60Hz 25.175MHz
     parameter C_H_SYNC_PULSE    =   96;
     parameter C_H_BACK_PORCH    =   48;
     parameter C_H_ACTIVE_TIME   =   640;
@@ -30,13 +30,13 @@ module  VGA(
     logic   [11:0]  R_h_cnt;    // horizontal counter
     logic   [11:0]  R_v_cnt;    // vertical counter
     logic           R_clk_25M;    
-	 
+     
     logic           W_active_flag;  // display enable
 
-    logic [11:0] top;
-    logic [11:0] bottom;
-    logic [11:0] left;
-    logic [11:0] right;
+    logic [9:0] top;
+    logic [9:0] bottom;
+    logic [9:0] left;
+    logic [9:0] right;
     parameter C_IMAGE_HEIGHT = 5;
     parameter C_IMAGE_WIDTH = 5;
 
@@ -47,12 +47,12 @@ module  VGA(
                             &&
                             ((C_V_SYNC_PULSE + C_V_BACK_PORCH) <= R_v_cnt 
                             <= (C_V_SYNC_PULSE + C_V_BACK_PORCH + C_V_ACTIVE_TIME)); 
-									 
+                                     
     assign o_vga_clk = R_clk_25M;
-	 assign o_tblf[3] = R_v_cnt >= top;
-	 assign o_tblf[2] = R_v_cnt <= bottom;
-	 assign o_tblf[1] = R_h_cnt >= left;
-	 assign o_tblf[0] = R_h_cnt <= right;
+     assign o_tblf[3] = R_v_cnt >= top;
+     assign o_tblf[2] = R_v_cnt <= bottom;
+     assign o_tblf[1] = R_h_cnt >= left;
+     assign o_tblf[0] = R_h_cnt <= right;
 
     always @(posedge i_clk or negedge i_rst_n) begin
         if (!i_rst_n) begin
@@ -67,7 +67,7 @@ module  VGA(
         if (!i_rst_n) begin
             R_h_cnt  <=  12'd0;
         end
-		  else if (R_h_cnt == C_H_LINE_PERIOD - 1'b1) begin
+          else if (R_h_cnt == C_H_LINE_PERIOD - 1'b1) begin
             R_h_cnt  <=  12'd0;
         end
         else begin
@@ -79,7 +79,7 @@ module  VGA(
         if (!i_rst_n) begin
             R_v_cnt  <=  12'd0;
         end
-		  else if (R_v_cnt == C_V_FRAME_PERIOD - 1'b1) begin
+          else if (R_v_cnt == C_V_FRAME_PERIOD - 1'b1) begin
             R_v_cnt  <=  12'd0;
         end
         else if (R_h_cnt == C_H_LINE_PERIOD - 1'b1) begin
@@ -155,7 +155,7 @@ module  VGA(
         end
         else if (W_active_flag) begin
             if(R_h_cnt >= left  && R_h_cnt <= right  && R_v_cnt >= top && R_v_cnt <= bottom) begin
-				//if(R_v_cnt >= top && R_v_cnt <= bottom) begin
+                //if(R_v_cnt >= top && R_v_cnt <= bottom) begin
                 o_red       <= 6'b111111;
                 o_green     <= 6'b111111;
                 o_blue      <= 6'b111111;     
@@ -175,16 +175,16 @@ module  VGA(
 
     always @(posedge R_clk_25M or negedge i_rst_n) begin
         if (!i_rst_n) begin
-            top     <= C_V_SYNC_PULSE + C_V_BACK_PORCH;
-            bottom  <= C_V_SYNC_PULSE + C_V_BACK_PORCH+ C_IMAGE_HEIGHT - 1'b1;
-            left     <= C_H_SYNC_PULSE + C_H_BACK_PORCH;
-            right   <= C_H_SYNC_PULSE + C_H_BACK_PORCH+ C_IMAGE_WIDTH  - 1'b1;
+            top     <= C_V_SYNC_PULSE + C_V_BACK_PORCH + 215;
+            bottom  <= C_V_SYNC_PULSE + C_V_BACK_PORCH + 215 + C_IMAGE_HEIGHT - 1'b1;
+            left     <= C_H_SYNC_PULSE + C_H_BACK_PORCH + 295;
+            right   <= C_H_SYNC_PULSE + C_H_BACK_PORCH + 295 + C_IMAGE_WIDTH  - 1'b1;
         end
         else begin
-            top     <= C_V_SYNC_PULSE + C_V_BACK_PORCH - Y_pos;
-            bottom  <= C_V_SYNC_PULSE + C_V_BACK_PORCH - Y_pos+ C_IMAGE_HEIGHT - 1'b1;
-            left     <= C_H_SYNC_PULSE + C_H_BACK_PORCH + X_pos;
-            right   <= C_H_SYNC_PULSE + C_H_BACK_PORCH + X_pos+ C_IMAGE_WIDTH  - 1'b1;
+            top     <= C_V_SYNC_PULSE + C_V_BACK_PORCH - Y_pos + 215;
+            bottom  <= C_V_SYNC_PULSE + C_V_BACK_PORCH - Y_pos + 215 + C_IMAGE_HEIGHT - 1'b1;
+            left     <= C_H_SYNC_PULSE + C_H_BACK_PORCH + X_pos + 295;
+            right   <= C_H_SYNC_PULSE + C_H_BACK_PORCH + X_pos + 295 + C_IMAGE_WIDTH  - 1'b1;
         end
     end
     
