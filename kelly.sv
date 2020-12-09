@@ -1,4 +1,4 @@
-module nemo (
+module kelly (
 	input clk,	
 	input rst_n,
 	output [9:0]  X_pos, Y_pos,
@@ -33,14 +33,14 @@ module nemo (
 	parameter DOWN 	= 3'b100;
 	parameter L_JUMP 	= 3'b101;
 	parameter R_JUMP 	= 3'b110;
-	parameter KEY_UP 				= 10'b0101110101;
-	parameter KEY_DOWN 			= 10'b0101110010;
-	parameter KEY_LEFT 			= 10'b0101101011;
-	parameter KEY_RIGHT 			= 10'b0101110100;
-	parameter KEY_UP_BREAK 		= 10'b1101110101;
-	parameter KEY_DOWN_BREAK 	= 10'b1101110010;
-	parameter KEY_LEFT_BREAK 	= 10'b1101101011;
-	parameter KEY_RIGHT_BREAK 	= 10'b1101110100;
+	parameter KEY_UP 			   = 10'b0000011101;
+	parameter KEY_DOWN 			= 10'b0000011011;
+	parameter KEY_LEFT 			= 10'b0000011100;
+	parameter KEY_RIGHT 		   = 10'b0000100011;
+	parameter KEY_UP_BREAK 		= 10'b1000011101;
+	parameter KEY_DOWN_BREAK 	= 10'b1000011011;
+	parameter KEY_LEFT_BREAK 	= 10'b1000011100;
+	parameter KEY_RIGHT_BREAK 	= 10'b1000100011;
 	logic [9:0] vertic_speed_w,vertic_speed_r;
 	logic [9:0] posx_w,posy_w,posx_r,posy_r;
 	logic [2:0] state_w,state_r; 
@@ -48,7 +48,6 @@ module nemo (
 	assign X_pos = posx_r;
 	assign Y_pos = posy_r;
 	assign state = state_w;
-
 
 	//單純處理state	
 	always_comb begin

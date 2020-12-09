@@ -1,9 +1,10 @@
-module nemo (
+module kelly (
 	input clk,	
 	input rst_n,
 	output [9:0]  X_pos, Y_pos,
 	output [2:0] state,
-	input [9:0]	  keycode
+	input [9:0]	  keycode,
+	output jumped
 );
 
 	logic clk_50hz;
@@ -33,22 +34,22 @@ module nemo (
 	parameter DOWN 	= 3'b100;
 	parameter L_JUMP 	= 3'b101;
 	parameter R_JUMP 	= 3'b110;
-	parameter KEY_UP 				= 10'b0101110101;
-	parameter KEY_DOWN 			= 10'b0101110010;
-	parameter KEY_LEFT 			= 10'b0101101011;
-	parameter KEY_RIGHT 			= 10'b0101110100;
-	parameter KEY_UP_BREAK 		= 10'b1101110101;
-	parameter KEY_DOWN_BREAK 	= 10'b1101110010;
-	parameter KEY_LEFT_BREAK 	= 10'b1101101011;
-	parameter KEY_RIGHT_BREAK 	= 10'b1101110100;
+	parameter KEY_UP 			= 10'b0100011101;
+	parameter KEY_DOWN 			= 10'b0100011011;
+	parameter KEY_LEFT 			= 10'b0100011100;
+	parameter KEY_RIGHT 		= 10'b0100100011;
+	parameter KEY_UP_BREAK 		= 10'b1100011101;
+	parameter KEY_DOWN_BREAK 	= 10'b1100011011;
+	parameter KEY_LEFT_BREAK 	= 10'b1100011100;
+	parameter KEY_RIGHT_BREAK 	= 10'b1100100011;
 	logic [9:0] vertic_speed_w,vertic_speed_r;
 	logic [9:0] posx_w,posy_w,posx_r,posy_r;
 	logic [2:0] state_w,state_r; 
-	logic on_the_ground_w,on_the_ground_r,attacking_w,attacking_r,jumped_w,jumped_r,rightjumpfix_w,rightjumpfix_r,leftjumpfix_w,leftjumpfix_r;
+	logic on_the_ground_w,on_the_ground_r,attacking_w,attacking_r,jumped_w,jumped_r;
 	assign X_pos = posx_r;
 	assign Y_pos = posy_r;
 	assign state = state_w;
-
+	assign jumped = jumped_r;
 
 	//單純處理state	
 	always_comb begin
@@ -97,17 +98,15 @@ module nemo (
 				end
 			end
 			R_JUMP:begin
-				if (posy_r >= GROUND_LEVEL && jumped_r == 1 && rightjumpfix_r == 1) begin
+				if (posy_r >= GROUND_LEVEL && jumped_r == 1) begin
+
 					state_w = IDLE;
-				end else if (posy_r >= GROUND_LEVEL && jumped_r == 1 && rightjumpfix_r == 0)begin
-					state_w = RIGHT;
 				end
 			end
 			L_JUMP:begin
-				if (posy_r >= GROUND_LEVEL && jumped_r == 1 && leftjumpfix_r == 1) begin
+				if (posy_r >= GROUND_LEVEL && jumped_r == 1) begin
+
 					state_w = IDLE;
-				end else if (posy_r >= GROUND_LEVEL && jumped_r == 1 && leftjumpfix_r == 0)begin
-					state_w = LEFT;
 				end
 			end
 		endcase
@@ -125,8 +124,6 @@ module nemo (
 			posx_w <= posx_r;
 			vertic_speed_w <= vertic_speed_r;
 			jumped_w <= jumped_r;
-			rightjumpfix_w <= rightjumpfix_r;
-			leftjumpfix_w <= leftjumpfix_r;
 			case(state_r)
 				IDLE:begin
 					posy_w <= GROUND_LEVEL;
@@ -145,19 +142,14 @@ module nemo (
 					posy_w <= posy_r - SPEED;
 				end
 				RIGHT:begin
-					rightjumpfix_w <= 0;
 					vertic_speed_w <= JUMPSPEED;
 					posx_w <= posx_r + SPEED;
 				end
 				LEFT:begin
-					leftjumpfix_w <= 0;
 					vertic_speed_w <= JUMPSPEED;
 					posx_w <= posx_r - SPEED;
 				end
 				R_JUMP:begin
-					if (keycode == KEY_RIGHT_BREAK) begin
-						rightjumpfix_w <= 1;
-					end
 					posx_w <= posx_r + SPEED;
 					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
 					vertic_speed_w <= vertic_speed_w - GRAVITY;
@@ -166,9 +158,6 @@ module nemo (
 					end
 				end
 				L_JUMP:begin
-					if (keycode == KEY_LEFT_BREAK) begin
-						leftjumpfix_w <= 1;
-					end
 					posx_w <= posx_r - SPEED;
 					posy_w <= ((posy_r - vertic_speed_r) >= GROUND_LEVEL) ? GROUND_LEVEL : posy_r - vertic_speed_r;
 					vertic_speed_w <= vertic_speed_w - GRAVITY;
@@ -187,16 +176,12 @@ module nemo (
 			posx_r <= 10'd300;
 			state_r <= IDLE;
 			jumped_r <= 0;
-			rightjumpfix_r <= 0;
-			leftjumpfix_r <= 0;
 		end else begin
 			vertic_speed_r <= vertic_speed_w;
 			state_r <= state_w;
 			posy_r <= posy_w;
 			posx_r <= posx_w;
 			jumped_r <= jumped_w;
-			rightjumpfix_r <= rightjumpfix_w;
-			leftjumpfix_r <= leftjumpfix_w;
 		end
 	end
 endmodule
