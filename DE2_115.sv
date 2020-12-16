@@ -26,7 +26,42 @@ module DE2_115(
 	output		          		VGA_HS,
 	output		     [7:0]		VGA_R,
 	output		          		VGA_SYNC_N,
-	output		          		VGA_VS
+	output		          		VGA_VS,
+	
+	
+	//////////// RS232 //////////
+	input 		          		UART_CTS,
+	output		          		UART_RTS,
+	input 		          		UART_RXD,
+	output		          		UART_TXD,
+	
+	//////////// Audio //////////
+	input 		          		AUD_ADCDAT,
+	inout 		          		AUD_ADCLRCK,
+	inout 		          		AUD_BCLK,
+	output		          		AUD_DACDAT,
+	inout 		          		AUD_DACLRCK,
+	output		          		AUD_XCK,
+	
+	//////////// SDRAM //////////
+	output		    [12:0]		DRAM_ADDR,
+	output		     [1:0]		DRAM_BA,
+	output		          		DRAM_CAS_N,
+	output		          		DRAM_CKE,
+	output		          		DRAM_CLK,
+	output		          		DRAM_CS_N,
+	inout 		    [31:0]		DRAM_DQ,
+	output		     [3:0]		DRAM_DQM,
+	output		          		DRAM_RAS_N,
+	output		          		DRAM_WE_N,
+	
+	output          [19:0]     SRAM_ADDR,
+	output                     SRAM_CE_N,
+	inout [15:0] SRAM_DQ,
+	output SRAM_LB_N,
+	output SRAM_OE_N,
+	output SRAM_UB_N,
+	output SRAM_WE_N
 );
 
 
@@ -43,6 +78,7 @@ module DE2_115(
 //=======================================================
 assign VGA_BLANK_N = VGA_HS & VGA_VS;
 assign VGA_SYNC_N = 1'b0;
+assign SRAM_WE_N = 1;
 
 Top top0(
 
@@ -60,9 +96,10 @@ Top top0(
    .o_vs(VGA_VS),  
    .o_red(VGA_R),
    .o_green(VGA_G),
-   .o_blue(VGA_B)
+   .o_blue(VGA_B),
 	
-	
+	.o_address(SRAM_ADDR),
+	.i_SRAMDATA(SRAM_DQ)
 	//.i_key_0(key0down),
 	//.i_key_1(key1down),
 	//.i_key_2(key2down),

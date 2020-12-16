@@ -1,0 +1,58 @@
+module VGAqueue (
+	input clk,    // Clock
+	input rst_n,  // Asynchronous reset active low
+	input [15:0] i_SRAMDATA,
+	input [19:0] address_from_vga,
+	inout enable,
+	output [19:0] address_to_dram,
+	output [7:0] vga_R,
+	output [7:0] vga_G,
+	output [7:0] vga_B
+);
+
+parameter IDLE = 3'd0;
+parameter GET_R = 3'd1;
+parameter GET_G = 3'd2;
+parameter GET_B = 3'd3;
+logic [2:0] state_r,state_w;
+logic [7:0] vga_R_r,vga_R_w,vga_G_r,vga_G_w,vga_B_r,vga_B_w;
+logic [19:0] address_dram;
+assign address_to_dram = address_dram;
+assign vga_R = vga_R_r;
+assign vga_G = vga_G_r;
+assign vga_B = vga_B_r;
+
+
+always_ff @(posedge clk or negedge rst_n)begin
+	if(~rst_n) begin
+		vga_R_r <= 0;
+		vga_G_r <= 0;
+		vga_B_r <= 0;
+		address_dram <= 0;
+	end else begin
+		case(state_r)
+			GET_R:begin
+				vga_R_r <= i_SRAMDATA[7:0];
+				state_r <= GET_G;
+				address_dram <= address_dram+1;
+			end
+			GET_G:begin
+				vga_G_r <= i_SRAMDATA[7:0];
+				state_r <= GET_B;
+				address_dram <= address_dram+1;
+			end
+			GET_B:begin
+				vga_R_r <= i_SRAMDATA[7:0];
+				state_r <= IDLE;
+				address_dram <= address_dram+1;
+			end
+			IDLE:begin
+				if (enable) begin
+					state_r <= GET_R;
+					enable <= 0;
+				end
+		endcase
+	end
+end
+
+endmodule

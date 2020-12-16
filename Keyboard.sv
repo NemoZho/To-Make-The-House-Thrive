@@ -8,7 +8,7 @@ module Keyboard(
     output          long_code,
     output          key_state,
     output  [7:0]   key_ascii,
-     output [9:0]     key_value
+	 output	[9:0]	  key_value
 );
 
     logic ps2_clk_0, ps2_clk_1, ps2_clk_2, ps2_clk_3;
@@ -21,8 +21,8 @@ module Keyboard(
     //assign negedge_ps2_clk = !ps2_clk_0 && !ps2_clk_1 && ps2_clk_2 && ps2_clk_3;
     assign negedge_ps2_clk = !ps2_clk_0 && ps2_clk_1 ;
     //assign key_ascii = flag ? ascii_tmp : key_ascii;
-     assign key_ascii = flag ? ascii_tmp : key_ascii;
-     assign key_value = value;
+	 assign key_ascii = flag ? ascii_tmp : key_ascii;
+	 assign key_value = value;
     assign key_state = flag;
 
     always @(posedge clk or negedge rst_n) begin
@@ -44,8 +44,8 @@ module Keyboard(
         if (!rst_n) begin
             counter_11 <= 4'd0;
         end 
-          else if ( counter_11 == 4'd11) begin
-            counter_11 <= 4'd0;
+		  else if ( counter_11 == 4'd11) begin
+			counter_11 <= 4'd0;
         end
         else if (negedge_ps2_clk) begin
             counter_11 <= counter_11 + 1'b1;
