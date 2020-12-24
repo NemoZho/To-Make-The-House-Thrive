@@ -8,11 +8,16 @@ module Top (
     output 				o_vga_clk,
     output 				o_hs,  
     output				o_vs,  
-    output	[7:0]		o_red,
-    output	[7:0]		o_green,
-    output	[7:0]		o_blue,
-	 output   [19:0]   o_address,
-	 input     [15:0]  i_SRAMDATA
+    output		[7:0]		o_red,
+    output		[7:0]		o_green,
+    output		[7:0]		o_blue,
+	 output   	[19:0]   o_address,
+	 input     	[15:0]  i_SRAMDATA,
+	 output    	[9:0]   nemo_xpos,
+	 output    	[9:0]   nemo_ypos,
+	 output		[4:0]		gesture,
+	 output		[7:0] 	health,
+	 output          [9:0]     keycode
 );
     logic break_code, long_code, key_state;
     logic [7:0] key_ascii;
@@ -30,6 +35,9 @@ module Top (
 	 logic [19:0] position;
 	 logic flag;
     assign o_ledg[2:0] = nemostate;
+	 assign nemo_xpos = X_pos;
+	 assign nemo_ypos = Y_pos;
+	 assign keycode = key_value;
 	 //assign o_ledr[17:9] = Y_pos;
 	 //assign o_ledr[15:0] = o_address == 0 ? i_SRAMDATA : o_ledr[15:0];
 	 //assign o_address = ;
@@ -48,26 +56,6 @@ Keyboard kb0(
 	 .key_value(key_value)
 );
 
-VGA vga0(
-	 .i_clk(i_clk),
-    .i_rst_n(i_rst_n),
-    .X_pos(X_pos),
-    .Y_pos(Y_pos),
-	 .X_pos_kelly(X_pos_kelly),
-	 .Y_pos_kelly(Y_pos_kelly),
-	 .i_red(red),
-	 .i_green(green),
-	 .i_blue(blue),
-	 .o_tblf(o_tblf),
-	 .o_vga_clk(o_vga_clk),
-    .o_hs(o_hs),  
-    .o_vs(o_vs),  
-    .o_red(o_red),
-    .o_green(o_green),
-    .o_blue(o_blue),
-	 .o_address(o_address),
-	 .i_SRAMDATA(i_SRAMDATA)
-);
 
 nemo nmsl(
 	.clk(i_clk),
@@ -75,7 +63,9 @@ nemo nmsl(
 	.X_pos(X_pos),
    .Y_pos(Y_pos),
 	.state(nemostate),
-	.keycode(key_value)
+	.keycode(key_value),
+	.gesture(gesture),
+	//.health(health)
 );
 
 kelly bitch(
@@ -84,7 +74,7 @@ kelly bitch(
 	.X_pos(X_pos_kelly),
    .Y_pos(Y_pos_kelly),
 	.state(kellystate),
-	.keycode(key_value)
+	.keycode(key_value),
 );
 
 

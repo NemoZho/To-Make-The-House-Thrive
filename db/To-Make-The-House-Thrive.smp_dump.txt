@@ -1,0 +1,6 @@
+
+State Machine - |DE2_115|rs232_qsys:my_qsys|RS232_test:rs232_0|avm_address_r
+Name avm_address_r.RX_BASE avm_address_r.STATUS_BASE avm_address_r.TX_BASE 
+avm_address_r.STATUS_BASE 0 0 0 
+avm_address_r.TX_BASE 0 1 1 
+avm_address_r.RX_BASE 1 1 0 
